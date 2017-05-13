@@ -2,21 +2,28 @@
 # qemu-user-static from repository
 ###############################################################################
 xcc = /opt/gcc-linaro-5.3.1-2016.05-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
-lib_path = /opt/gcc-linaro-5.3.1-2016.05-x86_64_arm-linux-gnueabihf/ 
+lib_path = /opt/gcc-linaro-5.3.1-2016.05-x86_64_arm-linux-gnueabihf/arm-linux-gnueabihf/libc
 
-define HELLO_C
-cat << EOF > hello.c
+define TEST_C
+cat << EOF > test.c
 #include <stdio.h>
 int main(void) { printf("Hello ARM!\n"); return 0; }
 EOF
 endef
-export HELLO_C
+export TEST_C
 
-hello.c:
-	sh -c "$$HELLO_C"
+test.c:
+	sh -c "$$TEST_C"
 
 # '|| true' mutes annoying non-zero value and reported error
-hello: hello.c
+test: test.c
 	@ $(xcc)gcc -static -o $@ $< && \
-	qemu-arm-static -L $(lib_path) ./hello || true
+	qemu-arm-static ./test || true
+
+###############################################################################
+# 1. asm Hello world
+###############################################################################
+hello: hello.S
+	@ $(xcc)gcc -o $@ $< && \
+	qemu-arm-static -L $(lib_path) ./$@ || true
 
