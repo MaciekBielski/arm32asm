@@ -3,6 +3,7 @@
 ###############################################################################
 xcc = /opt/gcc-linaro-5.3.1-2016.05-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
 lib_path = /opt/gcc-linaro-5.3.1-2016.05-x86_64_arm-linux-gnueabihf/arm-linux-gnueabihf/libc
+cflags = -march=armv7-a -mtune=cortex-a9
 
 define TEST_C
 cat << EOF > test.c
@@ -24,6 +25,6 @@ test: test.c
 # 1. asm Hello world
 ###############################################################################
 hello: hello.S
-	@ $(xcc)gcc -o $@ $< && \
+	@ $(xcc)gcc $(cflags) -o $@ $< && \
 	qemu-arm-static -L $(lib_path) ./$@ || true
 

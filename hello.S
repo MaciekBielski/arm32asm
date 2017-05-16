@@ -1,8 +1,14 @@
 	.data
 src:	.asciz	"This is a string of 8 bytes!!!!\n"
+	.align	2
 idx:	.byte	4,7,9,16,19,21	//index of spaces in the string
 	.equ	idx_sz, (.-idx)
 dst:	.space	32,'X'
+	.space	4, 0x0		//oterwise it also prints next string
+patt_xor:
+	.asciz	"0x3 eor 0x5 = %#x\n"
+patt_xnor:
+	.asciz	"0x3 orn 0x5 = %#x\n"	// not implemented function
 
 	.text
 	.globl main
@@ -39,6 +45,23 @@ get_id:
 	ldr	r0, =dst
 	bl	printf
 	mov	r0, #0
+
+	/* bitwise XOR */
+	mov	r6, #0b00000011
+	eor	r1, r6, #0b00000101
+	ldr	r0, =patt_xor
+	bl	printf
+	mov	r0, #0
+
+	/* XNOR==NOT(r1) == XOR(r1,0xFF) */
+	mov	r1, r6
+	eor	r1, r6, #0b00000101
+	eor	r1, r1, #0b1111
+	ldr	r0, =patt_xnor
+	bl	printf
+	mov	r0, #0
+
+	/* Return */
 	ldmfd	sp!, {lr}
 	mov	pc, lr
 
