@@ -4,8 +4,8 @@
 #xcc = /opt/gcc-linaro-5.3.1-2016.05-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
 xcc = /opt/gcc-linaro-6.3.1-2017.02-x86_64_arm-eabi/bin/arm-eabi-
 lib_path = /opt/gcc-linaro-5.3.1-2016.05-x86_64_arm-linux-gnueabihf/arm-linux-gnueabihf/libc
-cflags = -mtune=cortex-m4 -D_USE_IDIV_=1 -mfloat-abi=hard
-#cflags = -mtune=cortex-a9 -D_USE_IDIV_=1 -mfloat-abi=hard
+cflags = -mtune=cortex-m4 -mfloat-abi=hard
+# cflags = -mtune=cortex-a9 -mfloat-abi=hard
 
 define TEST_C
 cat << EOF > test.c
