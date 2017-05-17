@@ -9,6 +9,10 @@ patt_xor:
 	.asciz	"0x3 eor 0x5 = %#x\n"
 patt_xnor:
 	.asciz	"0x3 orn 0x5 = %#x\n"	// not implemented function
+patt_div:
+	.asciz "Div %u / %u = %u\n"
+patt_cpsr:
+	.asciz "CPSR: %#x\n"
 
 	.text
 	.globl main
@@ -58,6 +62,20 @@ get_id:
 	eor	r1, r6, #0b00000101
 	eor	r1, r1, #0b1111
 	ldr	r0, =patt_xnor
+	bl	printf
+	mov	r0, #0
+
+	/* Division - not available */
+	ldr	r1, =0xfef8		// 65272
+	mov	r2, #0x8
+	udiv	r3, r1, r2
+	ldr	r0, =patt_div
+	bl	printf
+	mov	r0, #0
+
+	/* Read the CPSR */
+	mrs	r1, CPSR
+	ldr	r0, =patt_cpsr
 	bl	printf
 	mov	r0, #0
 
