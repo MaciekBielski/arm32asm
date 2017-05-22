@@ -12,7 +12,9 @@ patt_xnor:
 patt_div:
 	.asciz "Div %u / %u = %u\n"
 patt_cpsr:
-	.asciz "CPSR: %#x\n"
+	.asciz "NZCV as hex: %#x\n"
+patt_res:
+	.asciz "res: %d\n"
 
 	.text
 	.globl main
@@ -65,19 +67,40 @@ get_id:
 	bl	printf
 	mov	r0, #0
 
+	/* Read the CPSR before*/
+	mrs	r2, CPSR
+	mov	r1, #0xf
+	and	r1, r2, r1, lsl #0x1b
+	lsr	r1, r1, #0x1c
+	ldr	r0, =patt_cpsr
+	bl	printf
+	mov	r0, #0
+
 	/* Division - not available */
 	ldr	r1, =0xfef8		// 65272
-	mov	r2, #0x8
+	mov	r2, #0x1
+	lslals	r2, r2, #0x3		// 1<<3
 	udiv	r3, r1, r2
 	ldr	r0, =patt_div
 	bl	printf
 	mov	r0, #0
 
-	/* Read the CPSR */
-	mrs	r1, CPSR
+	/* Read the CPSR after*/
+	mrs	r2, CPSR
+	mov	r1, #0xf
+	and	r1, r2, r1, lsl #0x1b
+	lsr	r1, r1, #0x1c
 	ldr	r0, =patt_cpsr
 	bl	printf
 	mov	r0, #0
+
+	/* Misc */
+	mov	r1, #0xfffffff0
+	mvn	r1, r1
+	ldr	r0, =patt_res
+	bl	printf
+	mov	r0, #0
+
 
 	/* Return */
 	ldmfd	sp!, {lr}

@@ -30,3 +30,6 @@ hello: hello.S
 	@ $(xcc)gcc $(cflags) -o $@ $< && \
 	qemu-arm-static -L $(lib_path) ./$@ || true
 
+e48p98: e48p98.S
+	@ $(xcc)gcc $(cflags) -o $@ $< && \
+	qemu-arm-static -L $(lib_path) ./$@ || true
