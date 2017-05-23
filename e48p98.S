@@ -14,9 +14,7 @@ b_h:	.long	0xbeef0000
 main:	stmfd	sp!, {lr}
 	/* Check CPSR */
 	mrs	r4, CPSR
-	mov	r5, #0xf
-	and	r4, r4, r5, lsl #0x1b
-	lsr	r1, r5, #0x1b
+	lsr	r1, r4, #0x1c
 	ldr	r0, =test_patt
 	bl	printf
 	mov	r0, #0
@@ -31,15 +29,15 @@ main:	stmfd	sp!, {lr}
 	ldr	r2, =b_l	//0xdead
 	ldr	r2, [r2]
 	adds	r3, r1, r2
+	mrs	r4, CPSR
 	ldr	r0, =out_patt
 	bl	printf
 	mov	r0, #0
 
 /* TODO: Why carry bit is not affected?? */
 	/* Check CPSR */
-	mov	r5, #0xf
-	and	r4, r4, r5, lsl #0x1b
-	lsr	r1, r5, #0x1b
+	mrs	r4, CPSR
+	lsr	r1, r4, #0x1c
 	ldr	r0, =test_patt
 	bl	printf
 	mov	r0, #0
