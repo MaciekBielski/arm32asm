@@ -1,5 +1,5 @@
 	.data
-src:	.asciz	"This is a string of 8 bytes!!!!\n"
+src:	.asciz	"This is a string of 8 words!!!!\n"
 	.align	2
 idx:	.byte	4,7,9,16,19,21	//index of spaces in the string
 	.equ	idx_sz, (.-idx)
@@ -67,42 +67,49 @@ get_id:
 	bl	printf
 	mov	r0, #0
 
-	/* Read the CPSR before*/
-	mrs	r2, CPSR
-	mov	r1, #0xf
-	and	r1, r2, r1, lsl #0x1b
-	lsr	r1, r1, #0x1c
-	ldr	r0, =patt_cpsr
-	bl	printf
-	mov	r0, #0
-
-	/* Division - not available */
+	/* Division */
 	ldr	r1, =0xfef8		// 65272
-	mov	r2, #0x1
-	lslals	r2, r2, #0x3		// 1<<3
+	mov	r2, #0x8
 	udiv	r3, r1, r2
 	ldr	r0, =patt_div
 	bl	printf
 	mov	r0, #0
 
-	/* Read the CPSR after*/
-	mrs	r2, CPSR
+	/* Read the CPSR before*/
+	mrs	r1, CPSR
 	mov	r1, #0xf
-	and	r1, r2, r1, lsl #0x1b
+	// [31:N|30:Z|29:C|28:V|...]
+	// r1 = r2 ^ (r1<<28)
+	and	r1, r2, r1, lsl #0x1c
+	lsr	r1, r1, #0x1c
+	ldr	r0, =patt_cpsr
+	bl	printf
+	mov	r0, #0
+
+	/* Force the signed overflow */
+	//cmp     r0, #1<<31
+	//cmnvc   r0, #1<<31
+
+
+	/* Read the CPSR after*/
+	mrs	r1, CPSR
+	mov	r4, #0xf
+	// [31:N|30:Z|29:C|28:V|...]
+	// r1 = r2 ^ (r1<<28)
+	and	r1, r2, r4, lsl #0x1c
 	lsr	r1, r1, #0x1c
 	ldr	r0, =patt_cpsr
 	bl	printf
 	mov	r0, #0
 
 	/* Misc */
-	mov	r1, #0xfffffff0
-	mvn	r1, r1
+	mov	r1, r7
 	ldr	r0, =patt_res
 	bl	printf
 	mov	r0, #0
 
 
-	/* Return */
+	/*Return */
 	ldmfd	sp!, {lr}
 	mov	pc, lr
 
