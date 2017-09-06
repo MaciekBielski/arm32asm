@@ -29,7 +29,7 @@ main:	stmfd	sp!, {lr}
 	/* First test ldm, stm */
 copy_loop:
 	ldmia	r1!, {r2-r5}
-	stmia	r0!, {r2-r5} 
+	stmia	r0!, {r2-r5}
 	add	r6, r6, #1		// Increment counter
 	cmp	r6, #2
 	blt	copy_loop
