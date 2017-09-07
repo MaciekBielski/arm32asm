@@ -1,5 +1,5 @@
-.thumb
-.syntax unified
+	.thumb
+	.syntax unified
 
 	.data
 src:	.asciz	"Hello binary!!!\n"

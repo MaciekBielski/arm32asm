@@ -38,9 +38,9 @@ hello: hello.S
 # try the Stellaris machines:
 ###############################################################################
 bare_metal: bare_metal.s bare_metal.ld
-	$(xcc)as -mcpu=cortex-m4 -g $@.s -o $@.o
-	$(xcc)as -mcpu=cortex-m4 -g bare_setup.s -o bare_setup.o
-	$(xcc)ld -T $@.ld bare_setup.o $@.o -o $@.elf
+	$(xcc)as -mcpu=cortex-m4 bare_metal.s -o bare_metal.o
+	$(xcc)as -mcpu=cortex-m4 bare_setup.s -o bare_setup.o
+	$(xcc)ld -T $@.ld bare_setup.o -o $@.elf
 	$(xcc)objcopy -O binary $@.elf $@.bin
 
 clean:
