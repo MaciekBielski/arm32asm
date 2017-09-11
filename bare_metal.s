@@ -1,4 +1,3 @@
-	.thumb
 	.syntax unified
 
 	.data

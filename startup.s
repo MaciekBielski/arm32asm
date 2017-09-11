@@ -12,7 +12,10 @@
  * 1) vectors
  * description: DUI05531_cortex_m4_dgug.pdf, p.37
  */
-	.weakref	reset_handler,default_reset_handler
+	.weak	reset_handler
+	.global	reset_handler
+	.set 	reset_handler, default_reset_handler
+
 	.weakref	NMI_handler,default_exception_handler
 	.weakref	hard_fault_handler,default_exception_handler
 	.weakref	mm_fault_handler,default_exception_handler
@@ -53,31 +56,20 @@
  */
 	.text
 	.align 2
-	.global default_reset_handler
 
 default_reset_handler:
 	/* branch and save the return address in link register */
-	mov	r5, #0x45
-	mov	r6, #0x45
-	mov	r7, #0x45
-	mov	r8, #0x45
-	mov	r9, #0x45
-	mov	r10, #0x45
-	mov	r11, #0x45
-	mov	r12, #0x45
-
 	ldr	r0, =_stext
 	ldr	r1, =_sdata
 	ldr	r2, =_data_sz
 
 	/* in case there is no data */
-	ldr	r4, =_data_sz
-	cmp	r4, #0x0
+	cmp	r2, #0
 	beq	_init_bss
 _copy:
-	ldrb	r3, [r0], #1
-	strb	r3, [r1], #1
-	subs	r2, r2, #1
+	ldr	r3, [r0], #4
+	str	r3, [r1], #4
+	subs	r2, r2, #4
 	bne	_copy
 
 /*

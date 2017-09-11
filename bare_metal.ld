@@ -21,24 +21,24 @@ MEMORY
 EXTERN (VECTORS)
 
 /* Define the entry point of the output file. */
-ENTRY(default_reset_handler)
+ENTRY(reset_handler)
 _estack = 0x20004000; /* end of 64K CCM RAM */
 
 SECTIONS
 {
 	/* put INTERRUPT_VECTOR and then rest of the code */
 	. = ALIGN(4);
-	_stext = .;	/* used to place data in flash */
 	.text :
 	{
+		_stext = .;	/* used to place data in flash */
 	    KEEP(startup.o (VECTORS))
 	    * (.text*)
 	    . = ALIGN(4);
 	    * (.rodata*)
 	    . = ALIGN(4);
-
 		_etext = .;	/* used to place data in flash */
 	} >flash
+	_data_sz = _etext - _stext;
 
 	/*
 	 * AT specifies LMA different than VMA (equal by default). Data has to
@@ -51,7 +51,6 @@ SECTIONS
 		. = ALIGN(4);
 		_edata = .;
 	} >ram AT >flash
-	_data_sz = _edata - _sdata;
 	_data_loadaddr = LOADADDR(.data);
 
 	.bss :
