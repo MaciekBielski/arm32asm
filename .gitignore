@@ -4,5 +4,12 @@
 !*.c
 !*.S
 !*.s
+!*.ld
+
+!gnuarmeclipse
+!xcc
 !Makefile
 !LICENSE
+!EUPLv1_2.txt
+!README
+
