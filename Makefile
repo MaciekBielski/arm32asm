@@ -32,12 +32,13 @@
 #
 ###############################################################################
 xcc = arm-none-eabi-
+asflags = -mimplicit-it=always
 cflags = -mcpu=cortex-m4 -march=armv7 -mlittle-endian -mfloat-abi=hard
 ld_script 	= ./bare_metal.ld
 gdbcmd		= .gdbcmd
 
 bare_metal: startup.s $(ld_script)
-	@$(xcc)as $(cflags) -g startup.s -o startup.o
+	@$(xcc)as $(asflags) $(cflags) -g startup.s -o startup.o
 	@$(xcc)ld -T $(ld_script) -g -o $@.elf startup.o
 	@$(xcc)objcopy -O binary $@.elf $@.bin
 

@@ -21,7 +21,7 @@ MEMORY
 EXTERN (VECTORS)
 
 /* Define the entry point of the output file. */
-ENTRY(ResetHandler)
+ENTRY(default_reset_handler)
 _estack = 0x20004000; /* end of 64K CCM RAM */
 
 SECTIONS

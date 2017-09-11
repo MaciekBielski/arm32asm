@@ -12,38 +12,50 @@
  * 1) vectors
  * description: DUI05531_cortex_m4_dgug.pdf, p.37
  */
-.section VECTORS, "x"
-.align 2
+	.weakref	reset_handler,default_reset_handler
+	.weakref	NMI_handler,default_exception_handler
+	.weakref	hard_fault_handler,default_exception_handler
+	.weakref	mm_fault_handler,default_exception_handler
+	.weakref	bus_fault_handler,default_exception_handler
+	.weakref	usg_fault_handler,default_exception_handler
+	.weakref	SVC_handler,default_exception_handler
+	.weakref	dbg_mon_handler,default_exception_handler
+	.weakref	pend_SV_handler,default_exception_handler
+	.weakref	sys_tick_handler,default_exception_handler
+
+	.section VECTORS, "x"
+	.align 2
 /* exporting the name to the linker */
-.global ResetHandler
-	.long	_estack /* top of kernel stack */
-	.long	ResetHandler /* Reset */
-	.long	0 /* NMI */
-	.long	0 /* Hard fault */
-	.long	0 /* Memory management fault */
-	.long	0 /* Bus fault */
-	.long	0 /* Usage fault */
+
+	.long	_estack /* defined in linker-script */
+	.long	reset_handler /* Reset */
+	.long	NMI_handler /* NMI */
+	.long	hard_fault_handler /* Hard fault */
+	.long	mm_fault_handler /* Memory management fault */
+	.long	bus_fault_handler /* Bus fault */
+	.long	usg_fault_handler /* Usage fault */
+ 	.long	0
+ 	.long	0
+ 	.long	0
 	.long	0
-	.long	0
-	.long	0
-	.long	0
-	.long	0 /* SVCall */
-	.long	0
-	.long	0
-	.long	0 /* PendSV */
-	.long	0 /* Systick */
-	.long	0 /* IRQ0 */
-	.long	0 /* IRQ1 */
-	.long	0 /* IRQ2 */
-	.equ	VECTORS_SZ, (. - VECTORS)
+	.long	SVC_handler /* SVCall */
+	.long	dbg_mon_handler /* Mon */
+	.long	pend_SV_handler /* PendSV */
+	.long	sys_tick_handler /* Systick */
+
+/*	.long	0  IRQ0 */
+/*	.long	0  IRQ1 */
+/*	...		*/
+ 	.equ	VECTORS_SZ, (. - VECTORS)
 
 /*
  * 2) code to copy data from Flash to RAM
  */
 	.text
 	.align 2
-ResetHandler:
-	//ldr	sp, =stack_top
+	.global default_reset_handler
+
+default_reset_handler:
 	/* branch and save the return address in link register */
 	mov	r5, #0x45
 	mov	r6, #0x45
