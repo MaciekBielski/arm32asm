@@ -22,7 +22,7 @@ EXTERN (VECTORS)
 
 /* Define the entry point of the output file. */
 ENTRY(reset_handler)
-_estack = 0x20004000; /* end of 64K CCM RAM */
+_estack = 0x20030000; /* end of 64K CCM RAM */
 
 SECTIONS
 {
@@ -32,8 +32,8 @@ SECTIONS
 	{
 		_stext = .;	/* used to place data in flash */
 	    KEEP(startup.o (VECTORS))
-	    * (.text*)
 	    . = ALIGN(4);
+	    * (.text*)
 	    * (.rodata*)
 	    . = ALIGN(4);
 		_etext = .;	/* used to place data in flash */
@@ -51,7 +51,7 @@ SECTIONS
 		. = ALIGN(4);
 		_edata = .;
 	} >ram AT >flash
-	_data_loadaddr = LOADADDR(.data);
+	/* _data_loadaddr = LOADADDR(.data); */
 
 	.bss :
 	{

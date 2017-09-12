@@ -39,7 +39,8 @@ gdbcmd		= .gdbcmd
 
 bare_metal: startup.s $(ld_script)
 	@$(xcc)as $(asflags) $(cflags) -g startup.s -o startup.o
-	@$(xcc)ld -T $(ld_script) -g -o $@.elf startup.o
+	@$(xcc)as $(asflags) $(cflags) -g $@.s -o $@.o
+	@$(xcc)ld -T $(ld_script) -g -o $@.elf startup.o $@.o
 	@$(xcc)objcopy -O binary $@.elf $@.bin
 
 # run:
@@ -66,6 +67,9 @@ set height 60
 file bare_metal.elf
 target extended-remote 127.0.0.1:1234
 handle SIGUSR1 nostop noprint pass
+load
+br start
+c
 
 endef
 export GDB_CMDS

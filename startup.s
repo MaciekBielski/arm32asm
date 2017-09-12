@@ -83,7 +83,7 @@ _init_bss:
 	cmp	r4, #0x0
 	beq	_init_sp
 
-	mov	r2, #0x0
+	ldr	r2, =0x0
 _zeroize:
 	strb	r2, [r0], #1
 	subs	r1, r1, #1
@@ -93,8 +93,7 @@ _zeroize:
  * 4) setup stack pointer
  */
 _init_sp:
-	mov	r1, #1
-	mov	r2, #2
-	add	r3, r1, r2
-
+	ldr	sp, =_estack
+	bl	start
 _stop:	b	_stop
+
