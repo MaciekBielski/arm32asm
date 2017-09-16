@@ -1,15 +1,20 @@
 ###############################################################################
 # 1. User-space programs, not used anymore
 ###############################################################################
+# sudo apt-get install gcc-arm-linux-gnueabihf libc6-dev-armhf-cross qemu-user-static
 #
-# lib_path = /opt/gcc-linaro-6.3.1-2017.02-x86_64_arm-eabi/arm-eabi/libc
-# cflags = -mtune=cortex-m4 -mfloat-abi=hard -O0 -fno-dce
-# cflags = -mtune=cortex-a9 -mfloat-abi=hard
+#_xcc = arm-none-eabi-
+#_lib_path = /usr/arm-none-eabi/lib
+_xcc = arm-linux-gnueabihf-
+_lib_path = /usr/arm-linux-gnueabihf/lib
+_cflags = -mcpu=cortex-a9 -mfloat-abi=hard -O0 -fno-dce
+#_cflags = -mcpu=cortex-m4
 #
 # These was for hello
-# hello: hello.S
-# 	@ $(xcc)gcc $(cflags) -o $@ $< && \
-# 	qemu-arm-static -L $(lib_path) ./$@ || true
+subrt: subrt.S
+	@ $(_xcc)gcc $(_cflags) -static -o $@ $< && \
+	qemu-arm-static -L $(_lib_path) ./$@ || true
+#
 # Test userspace programs
 # define TEST_C
 # cat << EOF > test.c
@@ -33,7 +38,7 @@
 ###############################################################################
 xcc = arm-none-eabi-
 asflags = -mimplicit-it=always
-cflags = -mcpu=cortex-m4 -march=armv7 -mlittle-endian -mfloat-abi=hard
+cflags = -mcpu=cortex-m4 -mlittle-endian -mfloat-abi=hard
 ld_script 	= ./bare_metal.ld
 gdbcmd		= .gdbcmd
 
@@ -79,7 +84,7 @@ gdb:
 
 
 clean:
-	@rm -f bare_metal.o bare_metal.elf bare_metal.bin bare_setup.o startup.o
+	@rm -f bare_metal.o bare_metal.elf bare_metal.bin bare_setup.o startup.o subrt
 
 monitor:
 	telnet 127.0.0.1 3333

@@ -25,6 +25,8 @@ Rules:
   [   CLEAN THE STACK   ]
 
  */
+	.syntax unified
+
 	.data
 ltrs:	.asciz	"AbCdEfG"
 delim:	.align	2

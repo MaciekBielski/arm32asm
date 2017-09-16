@@ -1,22 +1,25 @@
 	.syntax unified
 
-	.data
-src:	.asciz	"Hello binary!!!\n"
-	.equ	src_len, (.-src)
-	.align	2
-uart:	.word	0x09000000
-
 	.text
-.global	start
+	.global	start
 
 start:	stmfd	sp!, {lr}
 
-	ldr	r1, =0x0ffffffd
-	mov	r2, #5
-	add	r3, r1, r2
-	adc	r4, r1, r2
-	sub	r5, r4, r1
-	sbc	r6, r4, r6
+	/* Modify NZCVQ bits, zeroize C */
+	mrs	r1, APSR
+	bic	r1, r1, #0x20000000
+	msr	APSR_nzcvq, r1
+
+	mov	r2, #0xf
+	mov	r3, #6
+	subs	r5, r3, r2
+
+	/* Modify NZCVQ bits, zeroize C */
+	mrs	r1, APSR
+	bic	r1, r1, #0x20000000
+	msr	APSR_nzcvq, r1
+
+	sbcs	r6, r3, r2
 
 out:
 	ldmfd	sp!, {lr}
