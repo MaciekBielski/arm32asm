@@ -3,17 +3,33 @@
 ###############################################################################
 # sudo apt-get install gcc-arm-linux-gnueabihf libc6-dev-armhf-cross qemu-user-static
 #
-#_xcc = arm-none-eabi-
-#_lib_path = /usr/arm-none-eabi/lib
-_xcc = arm-linux-gnueabihf-
-_lib_path = /usr/arm-linux-gnueabihf/lib
-_cflags = -mcpu=cortex-a9 -mfloat-abi=hard -O0 -fno-dce
-#_cflags = -mcpu=cortex-m4
+_xcc 		= arm-linux-gnueabihf-
+#_lib_path 	= /usr/arm-linux-gnueabihf/lib
+_cflags 	= -mcpu=cortex-a9 -mfloat-abi=hard -O0 -fno-dce -g
+_curr_file 	= subrt
+hdbcmd		= .hdbcmd
+_xdb		= /opt/gcc-linaro-5.3.1-2016.05-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gdb
 #
 # These was for hello
 subrt: subrt.S
 	@ $(_xcc)gcc $(_cflags) -static -o $@ $< && \
-	qemu-arm-static -L $(_lib_path) ./$@ || true
+	qemu-arm-static -g 1234 ./$@
+
+define HDB_CMDS
+cat <<@ >$(hdbcmd)
+set height 60
+file $(_curr_file)
+target extended-remote 127.0.0.1:1234
+handle SIGUSR1 nostop noprint pass
+br main
+c
+@
+endef
+export HDB_CMDS
+
+hdb:
+	sh -c "$$HDB_CMDS" && \
+	cgdb -d$(_xdb) -- -q -x $(hdbcmd)
 #
 # Test userspace programs
 # define TEST_C
@@ -75,7 +91,7 @@ handle SIGUSR1 nostop noprint pass
 load
 br start
 c
-
+@
 endef
 export GDB_CMDS
 gdb:

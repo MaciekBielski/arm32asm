@@ -39,19 +39,11 @@ patt:	.asciz	"Letters: %c %c %c %c %c %c %c\n"
 
 main:	stmfd	sp!, {lr}
 	ldr	r4, =ltrs
-	ldr	r1, [r4], #0x1
-	and	r1, r1, #0xff
-	ldr	r2, [r4], #0x1
-	and	r2, r2, #0xff
-	ldr	r3, [r4], #0x1
-	and	r3, r3, #0xff
-	/* Pointer on 'd' */
-	/* Load rest of the letters on stack in a loop */
+	ldrb	r1, [r4], #0x1	//loading first 3 arguments
+	ldrb	r2, [r4], #0x1
+	ldrb	r3, [r4], #0x1	// r4 -> d
 	ldr	r5, =delim
-	sub	r5, r5, #0x1
-	// r5 -> G
-	// r4 -> d
-
+	sub	r5, r5, #0x1	// r5 -> G
 	/*
 	 * Stack pushing loop.
 	 * printf takes 4th and next arguments in the pattern string
@@ -59,44 +51,37 @@ main:	stmfd	sp!, {lr}
 	 */
 	mov	r7, #0			// count how many elemets pushed on stack
 loop:	ldrb	r6, [r5, #-0x1]!	// only one byte of a word is valid
-	strb	r6, [sp, #-0x4]!
+	strb	r6, [sp, #-0x4]!	// args are taken from stack as words
 	add	r7, r7, #0x1
 	cmp	r4, r5
 	blt	loop
-
-
+	/* Now arguments are pushed in the correct order */
 	ldr	r0, =patt
 	bl	printf
 	mov	r0, #0
-	add	sp, sp, r7, lsl #2
+	add	sp, sp, r7, lsl #2	// restore the stack
 
 	/* now lets do the same with stm */
 	ldr	r4, =ltrs2
-	ldr	r1, [r4], #0x1
-	and	r1, r1, #0xff
-	ldr	r2, [r4], #0x1
-	and	r2, r2, #0xff
-	ldr	r3, [r4], #0x1
-	and	r3, r3, #0xff
-
+	ldrb	r1, [r4], #0x1
+	ldrb	r2, [r4], #0x1
+	ldrb	r3, [r4], #0x1	// r4 -> s
 	/*
-	 * Elements should be loaded from the lowest registers in the same
-	 * order as they are expected to be read
+	 * Lowest register goes to lowest add = stack top, will be popped first
+	 * and a function is substituting them to pattern left-to-right
 	 */
-	ldr	r5, [r4], #0x1
-	and	r5, r5, #0xff
-	ldr	r6, [r4], #0x1
-	and	r6, r6, #0xff
-	ldr	r7, [r4], #0x1
-	and	r7, r7, #0xff
-	ldr	r8, [r4], #0x1
-	and	r8, r8, #0xff
-
+	ldrb	r5, [r4], #0x1
+	ldrb	r6, [r4], #0x1
+	ldrb	r7, [r4], #0x1
+	ldrb	r8, [r4], #0x1
+	mov	r9, sp
 	stmfd	sp!, {r5-r8}
+	rsb	r9, sp, r9	// reverse since stack grows downwards
+
 	ldr	r0, =patt
 	bl	printf
 	mov	r0, #0
-	add	sp, sp, #0x10
+	add	sp, sp, r9
 
 
 	/*Return */
