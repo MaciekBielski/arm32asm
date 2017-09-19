@@ -21,24 +21,38 @@ MEMORY
 EXTERN (VECTORS)
 
 /* Define the entry point of the output file. */
-ENTRY(reset_handler)
-_estack = 0x20030000; /* end of 64K CCM RAM */
+ENTRY(boot_reset_handler)
+_estack = 0x20030000; /* top of SRAM */
 
 SECTIONS
 {
 	/* put INTERRUPT_VECTOR and then rest of the code */
-	. = ALIGN(4);
+	.isr_vector :
+	{
+		. = ALIGN(4);
+		KEEP(startup.o (VECTORS))
+		. = ALIGN(4);
+	} >flash
+
 	.text :
 	{
-		_stext = .;	/* used to place data in flash */
-	    KEEP(startup.o (VECTORS))
-	    . = ALIGN(4);
-	    * (.text*)
-	    * (.rodata*)
-	    . = ALIGN(4);
-		_etext = .;	/* used to place data in flash */
+		. = ALIGN(4);
+		* (.text)
+		* (.text*)	/* boot_reset_handler goes here */
+		. = ALIGN(4);
+		_etext = .;
 	} >flash
-	_data_sz = _etext - _stext;
+
+	.rodata :
+	{
+		. = ALIGN(4);
+		* (.rodata)
+		* (.rodata*)
+		. = ALIGN(4);
+	} >flash
+
+	/* startup uses this to init the data */
+	_sidata = LOADADDR(.data)
 
 	/*
 	 * AT specifies LMA different than VMA (equal by default). Data has to
@@ -46,16 +60,37 @@ SECTIONS
 	 */
 	.data :
 	{
+		. = ALIGN(4);
 		_sdata = .;
+		* (.data)
 		* (.data*)
 		. = ALIGN(4);
 		_edata = .;
 	} >ram AT >flash
 	/* _data_loadaddr = LOADADDR(.data); */
 
+ /* CCM-RAM section
+  *
+  * IMPORTANT NOTE!
+  * If initialized variables will be placed in this section,
+  * the startup code needs to be modified to copy the init-values.
+  */
+  /* .ccmram : */
+  /* { */
+  /*   . = ALIGN(4); */
+  /*   _sccmram = .;       /1* create a global symbol at ccmram start *1/ */
+  /*   *(.ccmram) */
+  /*   *(.ccmram*) */
+
+  /*   . = ALIGN(4); */
+  /*   _eccmram = .;       /1* create a global symbol at ccmram end *1/ */
+  /* } >CCMRAM AT> FLASH */
+
 	.bss :
 	{
+		. = ALIGN(4);
 		_sbss = .;
+		*(.bss)
 		*(.bss*)
 		*(COMMON)
 		. = ALIGN(4);
